@@ -2,9 +2,9 @@ i have two branches for my one single dart package which i wish to publish at pu
 
 ## logic
 
-<!-- do not modify the version number of any of package in branch , while ppublishing cd.yml will bump it and then publish, warn all those who want to submit pull request -->
+<!-- do not modify the version number of any of package in branch , while publishing cd.yml will bump it and then publish, warn all those who want to submit pull request -->
 
-- every commit to => changelog with ci wirh cliff.toml file with action orhun/git-cliff-action@main
+- every commit to => changelog with ci with cliff.toml file with action orhun/git-cliff-action@main
 - template for clii.toml file
 - template for commit message => like chore ...
 - in main branch ci cd yaml file add a logic so that we can get the actor of pull request or say commit and can get the branch where the pull request is recieved
