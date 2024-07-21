@@ -1,0 +1,71 @@
+# name: Publish to pub.dev
+
+# on:
+#   repository_dispatch:
+#     types: [main_workflow_completed]
+
+#   workflow_dispatch:
+#   # push:
+#   #   branches:
+#   #     - main
+# concurrency:
+#   group: "publish"
+# jobs:
+#   publish:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: 📚 Git Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Git config
+#         run: |
+#           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+#           git config --local user.name "github-actions[bot]"
+
+#       - name: Determine branch name
+#         id: determine_branch
+#         run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+
+#       - name: 🎯 Setup Dart
+#         uses: dart-lang/setup-dart@v1
+#         with:
+#           sdk: dev
+
+#       - name: Make bump_version.sh executable
+#         run: chmod +x bump_version.sh
+
+#       - name: Bump version
+#         id: bump_version
+#         run: ./bump_version.sh
+
+#       - name: Generate a changelog
+#         uses: orhun/git-cliff-action@main
+#         id: git-cliff
+#         with:
+#           config: cliff.toml
+#           args: -vv --latest --no-exec --github-repo ${{ github.repository }}
+#         env:
+#           OUTPUT: CHANGES.md
+
+#       - name: Commit version bump
+#         run: |
+#           git add pubspec.yaml README.md
+#           git commit -m "chore: bump version to ${{ steps.bump_version.outputs.new_version }}"
+
+#       - name: Install dependencies
+#         run: dart pub get
+
+#       - name: Prepare pub credentials
+#         run: |
+#           mkdir -p $XDG_CONFIG_HOME/dart
+#           echo '${{ secrets.PUB_DEV_CREDENTIALS }}' > "$XDG_CONFIG_HOME/dart/pub-credentials.json"
+#         env:
+#           XDG_CONFIG_HOME: /home/runner/.config
+
+#       - name: Publish to pub.dev
+#         # env:
+#         #   PUB_DEV_CREDENTIALS: ${{ secrets.PUB_DEV_CREDENTIALS }}
+#         run: echo $PUB_DEV_CREDENTIALS | dart pub publish --force
+
+#       - name: Push changes
+#         run: git push origin ${{ steps.determine_branch.outputs.branch }}
