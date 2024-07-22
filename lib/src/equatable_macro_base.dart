@@ -113,9 +113,9 @@ macro class Equatable implements ClassDeclarationsMacro, ClassDefinitionMacro {
     final boolean = await  builder.resolveIdentifier(Uri.parse('dart:core'), 'bool');
       final integer = await builder.resolveIdentifier(Uri.parse('dart:core'), 'int');
       final string = await builder.resolveIdentifier(Uri.parse('dart:core'), 'String');
-    final defaultClassMethodHashCode = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>(elements.isGetter && elements.identifier.name.contains("hashCode") ))) ; 
-    final defaultClassMethodEqualEqual = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>(elements.isOperator && elements.identifier.name.contains("==")))) ; 
-    final defaultClassMethodToString = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>( elements.identifier.name.contains("toString")))) ; 
+    final defaultClassMethodHashCode = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>(elements.isGetter && elements.identifier.name == "hashCode" ))) ; 
+    final defaultClassMethodEqualEqual = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>(elements.isOperator && elements.identifier.name == "=="))) ; 
+    final defaultClassMethodToString = await builder.methodsOf(clazz).then((value)=>value.where((elements)=>( elements.identifier.name == "toString"))) ; 
      
     if (defaultClassMethodHashCode.isNotEmpty ) { //try using regex for exact matches
     for (var element in defaultClassMethodHashCode ) {
