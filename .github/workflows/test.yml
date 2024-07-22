@@ -1,0 +1,55 @@
+# name: Dart Package CI Test
+
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
+
+# on:
+#   pull_request:
+#   push:
+#     branches-ignore:
+#       - "**" # Ignore all branches by default
+#   workflow_dispatch:
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     if: ${{ github.repository_owner == 'antinna' || github.repository_owner == 'manishmg3994' || github.repository_owner == 'mg3994' }}
+#     name: ⚙️ Test
+#     steps:
+#       - name: 📚 Git Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Determine Branch Name
+#         id: determine_branch
+#         run: echo "::set-output name=branch::$(git rev-parse --abbrev-ref HEAD)"
+
+#       - name: 🎯 Setup Dart
+#         uses: dart-lang/setup-dart@v1
+#         with:
+#           sdk: dev
+
+#       - name: 📦 Install Dependencies
+#         run: dart pub get
+
+#       - name: 🔍 Analyze
+#         run: dart --enable-experiment=macros analyze --fatal-warnings lib
+
+#       - name: 🧪 Run Test
+#         # TODO(manishmg3994): move to dart test when macro support is stable
+#         run: dart --enable-experiment=macros test test/singleton_macro_test.dart
+
+#       - name: Check Branch and Trigger Workflow
+#         # if: ${{ github.event_name == 'push' }}
+#         run: |
+#           BRANCH="${{ github.event.ref }}"
+#           if [[ "${BRANCH}" =~ ^refs/heads/ ]]; then
+#             BRANCH="${BRANCH#refs/heads/}"
+#           fi
+#           if [[ "${BRANCH}" =~ ^(main|master)$ || "${BRANCH}" =~ ^dev.*$ ]]; then
+#             curl -X POST \
+#               -H "Accept: application/vnd.github.v3+json" \
+#               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+#               https://api.github.com/repos/${{ github.repository }}/dispatches \
+#               -d "{\"event_type\":\"${BRANCH}_workflow_completed\"}"
+#           fi

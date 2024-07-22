@@ -1,0 +1,39 @@
+name: Feature Request
+description: Use this template to propose a new feature or enhancement.
+title: "[Feature]: "
+labels: [enhancement]
+assignees: [] #manishmg3994
+projects: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to submit a feature request!
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: Feature Description
+      description: Describe the feature you’d like to see.
+      placeholder: Tell us about the feature you want.
+      value: "A new feature would be..."
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Explain how this feature would be used and why it's important.
+      placeholder: Describe the use case.
+      value: "This feature would be used to..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Suggested Solution
+      description: If you have a suggested solution or mitigation, please provide it.
+      placeholder: Suggested fix or mitigation.
+      value: "Suggested solution or mitigation for the vulnerability."
+    validations:
+      required: false

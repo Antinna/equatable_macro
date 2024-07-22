@@ -1,0 +1,46 @@
+name: Label New Issues Based on Creator's History
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  label-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Get the issue creator
+        id: issue
+        run: echo "::set-output name=creator::$(jq -r '.issue.user.login' $GITHUB_EVENT_PATH)"
+
+      - name: Get the number of issues created by the user
+        id: get-issues
+        run: |
+          ISSUE_CREATOR=${{ steps.issue.outputs.creator }}
+          echo "Checking number of issues created by $ISSUE_CREATOR"
+          ISSUE_COUNT=$(gh api -H "Accept: application/vnd.github.v3+json" \
+            /repos/${{ github.repository }}/issues?state=all \
+            --jq "[.[] | select(.user.login==\"$ISSUE_CREATOR\") | .number] | length")
+          echo "::set-output name=count::$ISSUE_COUNT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set label based on the number of issues
+        id: set-label
+        run: |
+          ISSUE_COUNT=${{ steps.get-issues.outputs.count }}
+          if [ "$ISSUE_COUNT" -eq "1" ]; then
+            LABEL="good first issue"
+          else
+            LABEL="good issue $ISSUE_COUNT"
+          fi
+          echo "::set-output name=label::$LABEL"
+
+      - name: Assign label
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ${{ steps.set-label.outputs.label }}

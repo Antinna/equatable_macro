@@ -1,0 +1,73 @@
+name: Bump Version and Update README
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Version type: main or stable"
+        required: true
+        default: "main"
+        type: choice
+        options:
+          - main
+          - stable
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Ensure the full history is fetched so that the branch can be switched
+
+      #   - name: Set up Node.js
+      #     uses: actions/setup-node@v3
+      #     with:
+      #       node-version: "14"
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Switch to the target branch
+        run: |
+          git checkout -b ${{ github.event.inputs.version_type }}
+
+      - name: Ensure correct version format in CHANGELOG.md
+        run: |
+          chmod +x ./scripts/update_changelog_versions.sh
+          ./scripts/update_changelog_versions.sh ${{ github.event.inputs.version_type }}
+
+      - name: Bump version in pubspec.yaml and README.md
+        id: bump-version
+        run: |
+          chmod +x ./scripts/bump_version.sh
+          ./scripts/bump_version.sh ${{ github.event.inputs.version_type }}
+
+      - name: Update README file
+        run: |
+          if [ "${{ github.event.inputs.version_type }}" == "main" ]; then
+            cp README-main.md README.md
+          else
+            cp README-stable.md README.md
+          fi
+
+      - name: Commit changes
+        run: |
+          git add pubspec.yaml README.md
+          # Add other relevant files only if needed
+          if [ "${{ github.event.inputs.version_type }}" == "main" ]; then
+            git add LICENSE CHANGELOG.md .pubignore analysis_options.yaml lib/ test/ example/ screenshots/
+          else
+            git add LICENSE CHANGELOG.md .pubignore analysis_options.yaml lib/ test/ example/ screenshots/
+          fi
+          git commit -m "Bump version to $(grep '^version: ' pubspec.yaml | awk '{print $2}')"
+          git push origin ${{ github.event.inputs.version_type }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
